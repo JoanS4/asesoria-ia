@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asesoría IA | Consultas Laborales, Fiscales y de Seguros</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #1a3a5c;
+      --accent:    #2e7dd1;
+      --accent-h:  #1b5fa8;
+      --bg:        #f4f6f9;
+      --card:      #ffffff;
+      --border:    #d1d9e6;
+      --text:      #1e2a38;
+      --muted:     #6b7a8d;
+      --success:   #1a7a4a;
+      --success-bg:#e6f4ed;
+      --error:     #b91c1c;
+      --error-bg:  #fef2f2;
+      --tg:        #0088cc;
+      --tg-h:      #006fa3;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 24px 24px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    header h1 span { color: #7eb8f7; }
+    header p {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #b8cfe8;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── Badges de área ── */
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .badge {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      color: #d6e8f9;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      max-width: 720px;
+      width: 100%;
+      margin: 36px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    /* ── Form ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 540px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 18px; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    label .req { color: var(--accent); margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(46,125,209,0.12);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.5;
+    }
+    select { cursor: pointer; }
+
+    /* ── Tipo persona toggle ── */
+    .toggle-group {
+      display: flex;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .toggle-group input[type="radio"] { display: none; }
+    .toggle-group label {
+      flex: 1;
+      text-align: center;
+      padding: 9px 12px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      background: #fff;
+      border: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .toggle-group label:not(:last-child) {
+      border-right: 1.5px solid var(--border);
+    }
+    .toggle-group input[type="radio"]:checked + label {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── File upload ── */
+    .file-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .file-upload-area:hover,
+    .file-upload-area.dragover {
+      border-color: var(--accent);
+      background: #f0f6ff;
+    }
+    .file-upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .file-upload-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .file-upload-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .file-upload-text strong { color: var(--accent); }
+    .file-name {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: var(--success);
+      font-weight: 600;
+      display: none;
+    }
+    .file-name.visible { display: block; }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+      letter-spacing: 0.2px;
+    }
+    .btn-submit:hover { background: var(--accent-h); }
+    .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:disabled {
+      background: #9ab8d8;
+      cursor: not-allowed;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Alerts ── */
+    .alert {
+      display: none;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .alert.success {
+      display: block;
+      background: var(--success-bg);
+      border: 1px solid #a7d9bc;
+      color: var(--success);
+    }
+    .alert.error {
+      display: block;
+      background: var(--error-bg);
+      border: 1px solid #fca5a5;
+      color: var(--error);
+    }
+
+    /* ── Telegram card ── */
+    .tg-card {
+      background: linear-gradient(135deg, #e8f4fd 0%, #dbeeff 100%);
+      border: 1px solid #b3d4f0;
+      border-radius: 12px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .tg-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--tg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .tg-icon svg { width: 28px; height: 28px; fill: #fff; }
+    .tg-content h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .tg-content p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .btn-tg {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 9px 18px;
+      background: var(--tg);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-tg:hover { background: var(--tg-h); }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+      padding: 0 8px 8px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--card);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <h1>Asesoría <span>IA</span></h1>
+  <p>Consultas orientativas sobre derecho laboral, fiscal y seguros. Respuesta por email en minutos.</p>
+  <div class="badges">
+    <span class="badge">⚖️ Laboral</span>
+    <span class="badge">🧾 Fiscal</span>
+    <span class="badge">🛡️ Seguros</span>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- FORMULARIO -->
+  <div class="card">
+    <div class="card-title">
+      <div class="icon">✉</div>
+      Envía tu consulta
+    </div>
+
+    <form id="consultaForm" novalidate>
+
+      <!-- Nombre + Email -->
+      <div class="form-row">
+        <div class="field">
+          <label for="nombre">Nombre <span class="req">*</span></label>
+          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre completo" required />
+        </div>
+        <div class="field">
+          <label for="email">Email <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+        </div>
+      </div>
+
+      <!-- Tipo persona -->
+      <div class="field">
+        <label>Tipo de persona <span class="req">*</span></label>
+        <div class="toggle-group">
+          <input type="radio" id="tp_particular" name="tipo_persona" value="Particular" checked />
+          <label for="tp_particular">Particular</label>
+          <input type="radio" id="tp_autonomo" name="tipo_persona" value="Autónomo" />
+          <label for="tp_autonomo">Autónomo</label>
+          <input type="radio" id="tp_empresa" name="tipo_persona" value="Empresa" />
+          <label for="tp_empresa">Empresa</label>
+        </div>
+      </div>
+
+      <!-- Área + Tipo consulta -->
+      <div class="form-row">
+        <div class="field">
+          <label for="area">Área <span class="req">*</span></label>
+          <select id="area" name="area" required>
+            <option value="" disabled selected>Selecciona área</option>
+            <option value="Laboral">⚖️ Laboral</option>
+            <option value="Fiscal">🧾 Fiscal</option>
+            <option value="Seguros">🛡️ Seguros</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tipo_consulta">Tipo de consulta <span class="req">*</span></label>
+          <select id="tipo_consulta" name="tipo_consulta" required>
+            <option value="" disabled selected>Selecciona tipo</option>
+            <!-- Laboral -->
+            <optgroup label="Laboral" id="opt-laboral">
+              <option value="Despido">Despido</option>
+              <option value="Contrato">Contrato</option>
+              <option value="Salario y nómina">Salario y nómina</option>
+              <option value="Baja médica / IT">Baja médica / IT</option>
+              <option value="Acoso laboral">Acoso laboral</option>
+              <option value="Otro laboral">Otro</option>
+            </optgroup>
+            <!-- Fiscal -->
+            <optgroup label="Fiscal" id="opt-fiscal">
+              <option value="IRPF / Renta">IRPF / Renta</option>
+              <option value="IVA">IVA</option>
+              <option value="Impuesto de Sociedades">Impuesto de Sociedades</option>
+              <option value="Sanciones Hacienda">Sanciones Hacienda</option>
+              <option value="Autónomos / módulos">Autónomos / módulos</option>
+              <option value="Otro fiscal">Otro</option>
+            </optgroup>
+            <!-- Seguros -->
+            <optgroup label="Seguros" id="opt-seguros">
+              <option value="Seguro de vida">Seguro de vida</option>
+              <option value="Seguro de hogar">Seguro de hogar</option>
+              <option value="Seguro de salud">Seguro de salud</option>
+              <option value="Seguro de coche">Seguro de coche</option>
+              <option value="Reclamación siniestro">Reclamación siniestro</option>
+              <option value="Otro seguros">Otro</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="field">
+        <label for="descripcion">Describe tu consulta <span class="req">*</span></label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          placeholder="Explica tu situación con el máximo detalle posible: fechas, importes, circunstancias relevantes..."
+          required
+          minlength="20"
+        ></textarea>
+      </div>
+
+      <!-- Adjunto PDF -->
+      <div class="field">
+        <label>Adjuntar documento (opcional)</label>
+        <div class="file-upload-area" id="dropZone">
+          <input type="file" id="adjunto_pdf" name="adjunto_pdf" accept=".pdf,.jpg,.jpeg,.png" />
+          <div class="file-upload-icon">📎</div>
+          <div class="file-upload-text">
+            <strong>Haz clic o arrastra</strong> tu documento aquí<br />
+            PDF, JPG o PNG · Máx. 5 MB
+          </div>
+          <div class="file-name" id="fileName"></div>
+        </div>
+      </div>
+
+      <!-- Alertas -->
+      <div class="alert" id="alertMsg"></div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="btnSubmit">
+        <span id="btnText">Enviar consulta</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- TELEGRAM -->
+  <div class="tg-card">
+    <div class="tg-icon">
+      <!-- Telegram SVG icon -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      </svg>
+    </div>
+    <div class="tg-content">
+      <h3>¿Prefieres una consulta rápida?</h3>
+      <p>Escríbenos directamente por Telegram y recibe orientación inmediata. También recibirás la respuesta completa en tu email.</p>
+      <a href="https://t.me/AsesoriaIA_bot" target="_blank" class="btn-tg" id="tgLink">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Abrir en Telegram
+      </a>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <p class="disclaimer">
+    Las respuestas generadas tienen carácter <strong>orientativo</strong> y no constituyen asesoramiento jurídico profesional.<br />
+    No sustituyen la consulta con un abogado, asesor fiscal o corredor de seguros colegiado.
+  </p>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  © 2025 Asesoría IA · Powered by GPT-4o + RAG · <a href="mailto:info@asesoria-ia.com" style="color:var(--accent)">info@asesoria-ia.com</a>
+</footer>
+
+<!-- ── JAVASCRIPT ── -->
+<script>
+  // ── Configuración ──────────────────────────────────────────────
+  // IMPORTANTE: Cambia esta URL por tu webhook de producción de n8n
+  // cuando actives el flujo. Para testing usa la URL con -test.
+  const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook-test/asesoria-ia-mvp';
+  // const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook/asesoria-ia-mvp'; // ← producción
+
+  // ── File upload UX ─────────────────────────────────────────────
+  const fileInput  = document.getElementById('adjunto_pdf');
+  const dropZone   = document.getElementById('dropZone');
+  const fileNameEl = document.getElementById('fileName');
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) {
+      fileNameEl.textContent = '✅ ' + fileInput.files[0].name;
+      fileNameEl.classList.add('visible');
+    }
+  });
+
+  ['dragover', 'dragenter'].forEach(e => {
+    dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(e => {
+    dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', ev => {
+    const file = ev.dataTransfer.files[0];
+    if (file) {
+      fileInput.files = ev.dataTransfer.files;
+      fileNameEl.textContent = '✅ ' + file.name;
+      fileNameEl.classList.add('visible');
+    }
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function showAlert(type, msg) {
+    const el = document.getElementById('alertMsg');
+    el.className = 'alert ' + type;
+    el.innerHTML = msg;
+  }
+  function hideAlert() {
+    const el = document.getElementById('alertMsg');
+    el.className = 'alert';
+  }
+  function setLoading(loading) {
+    const btn     = document.getElementById('btnSubmit');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+    btn.disabled       = loading;
+    btnText.style.display = loading ? 'none' : 'inline';
+    spinner.style.display = loading ? 'block' : 'none';
+  }
+
+  // ── File → Base64 ──────────────────────────────────────────────
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]); // solo el contenido base64
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ── Form submit ────────────────────────────────────────────────
+  document.getElementById('consultaForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    hideAlert();
+
+    // Validación básica
+    const nombre      = document.getElementById('nombre').value.trim();
+    const email       = document.getElementById('email').value.trim();
+    const area        = document.getElementById('area').value;
+    const tipo        = document.getElementById('tipo_consulta').value;
+    const descripcion = document.getElementById('descripcion').value.trim();
+    const tipoPersona = document.querySelector('input[name="tipo_persona"]:checked').value;
+
+    if (!nombre || !email || !area || !tipo || !descripcion) {
+      showAlert('error', '⚠️ Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+    if (descripcion.length < 20) {
+      showAlert('error', '⚠️ La descripción es demasiado corta. Añade más detalle para recibir una respuesta útil.');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showAlert('error', '⚠️ El formato del email no es válido.');
+      return;
+    }
+
+    // Validar tamaño del archivo
+    const file = fileInput.files[0];
+    if (file && file.size > 5 * 1024 * 1024) {
+      showAlert('error', '⚠️ El archivo supera el límite de 5 MB.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Construir payload JSON (igual que el de Postman)
+      const payload = {
+        nombre,
+        email,
+        tipo_persona: tipoPersona,
+        area,
+        tipo_consulta: tipo,
+        descripcion
+      };
+
+      // Si hay PDF/imagen, convertir a base64
+      if (file) {
+        const b64 = await fileToBase64(file);
+        payload.adjunto_pdf = b64;
+        payload.adjunto_nombre = file.name;
+        payload.adjunto_tipo   = file.type;
+      }
+
+      // Enviar al webhook de n8n
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        // Éxito: mostrar confirmación y limpiar formulario
+        showAlert('success',
+          '✅ <strong>Consulta enviada correctamente.</strong><br />' +
+          'Recibirás la respuesta en <strong>' + email + '</strong> en los próximos minutos.'
+        );
+        this.reset();
+        fileNameEl.classList.remove('visible');
+        fileNameEl.textContent = '';
+      } else {
+        const errText = await response.text();
+        console.error('Error webhook:', response.status, errText);
+        showAlert('error',
+          '❌ <strong>Error al enviar la consulta.</strong><br />' +
+          'Por favor, inténtalo de nuevo o escríbenos por Telegram.'
+        );
+      }
+    } catch (err) {
+      console.error('Error de red:', err);
+      showAlert('error',
+        '❌ <strong>No se pudo conectar con el servidor.</strong><br />' +
+        'Comprueba tu conexión o inténtalo más tarde.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>
+
+</body>
+</html>
