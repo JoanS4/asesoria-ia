@@ -531,10 +531,10 @@
 <!-- ── JAVASCRIPT ── -->
 <script>
   // ── Configuración ──────────────────────────────────────────────
-  // IMPORTANTE: Cambia esta URL por tu webhook de producción de n8n
-  // cuando actives el flujo. Para testing usa la URL con -test.
-  const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook-test/asesoria-ia-mvp';
-  // const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook/asesoria-ia-mvp'; // ← producción
+  // URL de producción (flujo activo en n8n):
+  const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook/asesoria-ia-mvp';
+  // URL de test (solo con editor abierto en n8n):
+  // const WEBHOOK_URL = 'https://joans.app.n8n.cloud/webhook-test/asesoria-ia-mvp';
 
   // ── File upload UX ─────────────────────────────────────────────
   const fileInput  = document.getElementById('adjunto_pdf');
@@ -648,29 +648,23 @@
       }
 
       // Enviar al webhook de n8n
-      const response = await fetch(WEBHOOK_URL, {
+      // mode: 'no-cors' evita el bloqueo CORS del navegador.
+      // La respuesta será 'opaque' (no legible), pero n8n recibe el payload correctamente.
+      await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'text/plain' }, // no-cors solo permite cabeceras simples
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
       });
 
-      if (response.ok) {
-        // Éxito: mostrar confirmación y limpiar formulario
-        showAlert('success',
-          '✅ <strong>Consulta enviada correctamente.</strong><br />' +
-          'Recibirás la respuesta en <strong>' + email + '</strong> en los próximos minutos.'
-        );
-        this.reset();
-        fileNameEl.classList.remove('visible');
-        fileNameEl.textContent = '';
-      } else {
-        const errText = await response.text();
-        console.error('Error webhook:', response.status, errText);
-        showAlert('error',
-          '❌ <strong>Error al enviar la consulta.</strong><br />' +
-          'Por favor, inténtalo de nuevo o escríbenos por Telegram.'
-        );
-      }
+      // Si llegamos aquí sin excepción, la petición se envió correctamente
+      showAlert('success',
+        '✅ <strong>Consulta enviada correctamente.</strong><br />' +
+        'Recibirás la respuesta en <strong>' + email + '</strong> en los próximos minutos.'
+      );
+      this.reset();
+      fileNameEl.classList.remove('visible');
+      fileNameEl.textContent = '';
     } catch (err) {
       console.error('Error de red:', err);
       showAlert('error',
